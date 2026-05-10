@@ -1,0 +1,11 @@
+rules:
+  - id: detect-hardcoded-secrets
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $PASS = "..."
+          - pattern: |
+              $KEY = "..."
+    message: "Hardcoded secret detected. Use environment variables instead."
+    languages: [python]
+    severity: ERROR
