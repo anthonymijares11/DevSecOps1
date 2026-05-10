@@ -1,34 +1,29 @@
-name: DevSecOps Practical - Good Run
+name: DevSecOps-Good-Run
 on: [push]
 
 jobs:
-  devsecops-gate:
+  pipeline:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Dependency Scan (SCA)
+      - name: Dependency Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
-
-      - name: Unit Test Execution
+      - name: Unit Tests
         run: |
           pip install -r requirements.txt
           python -m pytest tests/
-
-      - name: Container Build
+      - name: Build & Container Scan
         run: docker build -t secure-app:latest .
-
-      - name: Container Vulnerability Scan
+      - name: Trivy Scan
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'secure-app:latest'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
           exit-code: '1'
-
-      - name: Deployment Stage
+      - name: Deploy
         run: echo "Deployment Successful!"
