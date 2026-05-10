@@ -144,7 +144,7 @@ const styles = {
 };
 
 // --- MAIN COMPONENT ---
-export default function SecurityPostureFramework() {
+export default function PostureFramework() {
   const [activeTab, setActiveTab] = useState('threats');
   const [activeDomain, setActiveDomain] = useState('D1');
   const [expandedId, setExpandedId] = useState(null);

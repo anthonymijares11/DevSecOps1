@@ -183,7 +183,7 @@ const LayerSection = ({ layer, activeNode, onNode }) => {
 };
 
 // --- MAIN ARCHITECTURE COMPONENT ---
-export default function SecurityArchitectureDiagram() {
+export default function Architecture() {
   const [activeNode, setActiveNode] = useState(null);
   const [showFlows, setShowFlows] = useState(true);
   const [pulse, setPulse] = useState(0);

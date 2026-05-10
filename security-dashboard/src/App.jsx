@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import PostureFramework from './PostureFramework';
+import PostureFramework from './PostureFramework'; 
 import Architecture from './Architecture';
 
 export default function App() {
-  const [view, setView] = useState('architecture'); // Toggle state
+  const [view, setView] = useState('architecture'); 
 
   const btnStyle = (active) => ({
     padding: '10px 20px',
@@ -14,13 +14,15 @@ export default function App() {
     fontFamily: 'monospace',
     fontWeight: 'bold',
     fontSize: '12px',
-    marginRight: '10px'
+    marginRight: '10px',
+    borderRadius: '4px',
+    transition: 'all 0.2s'
   });
 
   return (
-    <div style={{ backgroundColor: '#05060e', minHeight: '100vh' }}>
-      {/* Navigation Switcher */}
-      <nav style={{ padding: '20px', borderBottom: '1px solid #141630', textAlign: 'center' }}>
+    <div style={{ backgroundColor: '#05060e', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Global Navigation Switcher */}
+      <nav style={{ padding: '20px', borderBottom: '1px solid #141630', textAlign: 'center', backgroundColor: '#080a14' }}>
         <button 
           style={btnStyle(view === 'architecture')} 
           onClick={() => setView('architecture')}
@@ -29,14 +31,16 @@ export default function App() {
         </button>
         <button 
           style={btnStyle(view === 'framework')} 
-          onClick={() => setView('framework')}
+          onClick={() => setView(setView('framework'))}
         >
           📊 VIEW FRAMEWORK
         </button>
       </nav>
 
-      {/* Render the selected component */}
-      {view === 'architecture' ? <Architecture /> : <PostureFramework />}
+      {/* Conditional Rendering Logic */}
+      <div style={{ flex: 1 }}>
+        {view === 'architecture' ? <Architecture /> : <PostureFramework />}
+      </div>
     </div>
   );
 }
