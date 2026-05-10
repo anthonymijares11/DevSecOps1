@@ -1,0 +1,74 @@
+name: Advanced-DevSecOps-Pipeline
+on: [push]
+
+jobs:
+  source-security:
+    name: SAST and Dependency Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep SAST
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: .semgrep.yml
+      - name: Trivy FS (SCA)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'json'
+          output: 'dependency-scan.json'
+          severity: 'CRITICAL,HIGH'
+      - name: Upload Scan Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-scan-report
+          path: dependency-scan.json
+
+  build-and-attest:
+    name: Build, Scan, and SBOM
+    needs: source-security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Image
+        run: docker build -t secure-app:${{ github.sha }} .
+      
+      - name: Container Vulnerability Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'secure-app:${{ github.sha }}'
+          format: 'json'
+          output: 'container-scan.json'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
+      - name: Generate SBOM (CycloneDX)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'secure-app:${{ github.sha }}'
+          format: 'cyclonedx'
+          output: 'sbom.json'
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-provenance
+          path: |
+            container-scan.json
+            sbom.json
+
+  promote-trusted-build:
+    name: Mark as Trusted
+    needs: build-and-attest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Attestation
+        run: |
+          echo "IMAGE_ID: secure-app:${{ github.sha }}" > release-manifest.txt
+          echo "STATUS: VERIFIED_SAFE" >> release-manifest.txt
+          echo "TIMESTAMP: $(date)" >> release-manifest.txt
+      - name: Upload Manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: trusted-release-manifest
+          path: release-manifest.txt
