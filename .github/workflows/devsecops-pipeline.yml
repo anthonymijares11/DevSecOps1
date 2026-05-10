@@ -23,7 +23,6 @@ jobs:
         with:
           image-ref: 'secure-app:latest'
           severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true
           exit-code: '1'
       - name: Deploy
         run: echo "Deployment Successful!"
